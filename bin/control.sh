@@ -134,14 +134,14 @@ do
 		exit
 	;;
 	export)
-		node $HOMEDIR/bin/storage-cli.js export $2 $3 $4
+		node $HOMEDIR/bin/storage-cli.js "$@"
 		exit
 	;;
 	import)
 		if [ $RUNNING -eq 1 ]; then
 		    $0 stop
 		fi
-		node $HOMEDIR/bin/storage-cli.js import $2 $3 $4
+		node $HOMEDIR/bin/storage-cli.js "$@"
 		exit
 	;;
 	upgrade)
