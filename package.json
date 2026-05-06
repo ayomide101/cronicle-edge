@@ -68,6 +68,7 @@
 		"pixl-tools": "^1.1.7",
 		"pixl-webapp": "^2.0.3",
 		"read-last-lines": "^1.8.0",
+		"sanitize-html": "^2.13.1",
 		"shell-quote": "1.7.3",
 		"socket.io": "4.8.1",
 		"socket.io-client": "4.8.1",
