@@ -514,7 +514,7 @@ if [ "$test" = 1 ]; then
   writehead " Bundling unit test files"
   esbuild --bundle --log-level=info --minify=false --platform=node --outdir=$dist/bin lib/test.js
   writehead " Running tests"
-  node node_modules/pixl-unit/unit.js $dist/bin/test.js
+  node node_modules/pixl-unit/unit.js $dist/bin/test.js --verbose
   # remove test files
   rm $dist/bin/test.js
 fi

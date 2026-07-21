@@ -9,7 +9,7 @@ var cp = require('child_process');
 var os = require('os');
 var fs = require('fs');
 var async = require('async');
-var bcrypt = require('bcrypt-node');
+var bcrypt = require('bcryptjs');
 var dns = require('dns')
 
 var Args = require('pixl-args');
