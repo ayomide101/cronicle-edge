@@ -161,6 +161,7 @@ Class.subclass(Page.Base, "Page.JobDetails", {
 		var job = deep_copy_object(event);
 		job.now = this.job.now;
 		job.params = this.job.params;
+		job.arg = this.job.arg;
 
 		app.showProgress(1.0, "Starting job...");
 
@@ -252,13 +253,18 @@ Class.subclass(Page.Base, "Page.JobDetails", {
 
 		let timing = summarize_event_timing(event.timing, event.timezone)
 
+		let source = job.source || 'Scheduler'
+		if(job.source_id) {
+			source = `<a href="#JobDetails?id=${job.source_id}">${source}</a>`
+		}
+
 		html += `
 		  <div class="job-details grid-container" style="font-size:1.1em">
 		    
 		    <div class="job-details  grid-item"><div class="info_label">JOB ID:</div><div class="info_value">${job.id}</div></div>
 			<div class="job-details  grid-item"><div class="info_label">PID:</div><div class="info_value">${(job.detached_pid || job.pid || '(Unknown)')}</div></div>
 		    <div class="job-details  grid-item"><div class="info_label">CAT:</div><div class="info_value">${jobCategory}</div></div>
-		    <div class="job-details  grid-item"><div class="info_label">SOURCE:</div><div title="${timing}" class="info_value">${job.source || 'Scheduler'}</div></div>
+		    <div class="job-details  grid-item"><div class="info_label">SOURCE:</div><div title="${timing}" class="info_value">${source}</div></div>
 			<div class="job-details  grid-item"><div class="info_label">TARGET:</div><div class="info_value">${jobTarget}</div></div>
 		    <div class="job-details  grid-item"><div class="info_label">START:</div><div class="info_value">${jobStarted}</div></div>
 			<div class="job-details  grid-item"><div class="info_label">ELAPSED:</div><div class="info_value">${get_text_from_seconds(job.elapsed, false, false)}</div></div>		    
@@ -308,13 +314,13 @@ Class.subclass(Page.Base, "Page.JobDetails", {
 		// custom data table
 		if (job.table && job.table.rows && job.table.rows.length) {
 			var table = job.table;
-			html += '<div class="subtitle" style="margin-top:15px;">' + (table.title || 'Job Stats') + '</div>';
+			html += '<div class="subtitle" style="margin-top:15px;">' + encode_entities(table.title || 'Job Stats') + '</div>';
 			html += '<table class="data_table" style="width:100%">';
 
 			if (table.header && table.header.length) {
 				html += '<tr>';
 				for (var idx = 0, len = table.header.length; idx < len; idx++) {
-					html += '<th>' + table.header[idx] + '</th>';
+					html += '<th>' + encode_entities(table.header[idx]) + '</th>';
 				}
 				html += '</tr>';
 			}
@@ -330,14 +336,14 @@ Class.subclass(Page.Base, "Page.JobDetails", {
 						var col = row[idy];
 						html += '<td>';
 						if (typeof (col) != 'undefined') {
-							if (filters[idy] && window[filters[idy]]) html += window[filters[idy]](col);
+							if (filters[idy] && window[filters[idy]]) html += encode_entities(window[filters[idy]](col));
 							else if ((typeof (col) == 'string') && col.match(/^filter\:(\w+)\((.+)\)$/)) {
 								var filter = RegExp.$1;
 								var value = RegExp.$2;
-								if (window[filter]) html += window[filter](value);
-								else html += value;
+								if (window[filter]) html += encode_entities(window[filter](value));
+								else html += encode_entities(value);
 							}
-							else html += col;
+							else html += encode_entities(col);
 						}
 						html += '</td>';
 					} // foreach col
@@ -347,15 +353,15 @@ Class.subclass(Page.Base, "Page.JobDetails", {
 			} // foreach row
 
 			html += '</table>';
-			if (table.caption) html += '<div class="caption" style="margin-top:4px; text-align:center;">' + table.caption + '</div>';
+			if (table.caption) html += '<div class="caption" style="margin-top:4px; text-align:center;">' + encode_entities(table.caption) + '</div>';
 		} // custom data table
 
 		// custom html table (and also error output on job detail page)
 		//adding replace to remove ansi color characters
 		if (job.html) {
-			html += '<div class="subtitle" style="margin-top:15px;">' + (job.html.title || 'Job Report') + '</div>';
-			html += '<div>' + job.html.content.replace(/\x1B\[[0-?]*[ -/]*[@-~]/g, "") + '</div>';
-			if (job.html.caption) html += '<div class="caption" style="margin-top:4px; text-align:center;">' + job.html.caption + '</div>';
+			html += '<div class="subtitle" style="margin-top:15px;">' + encode_entities(job.html.title || 'Job Report') + '</div>';
+			html += '<div>' + job.html.content.replace(/\x1B\[[0-?]*[ -/]*[@-~]/g, "") + '</div>'; // content was pre-sanitized on the server
+			if (job.html.caption) html += '<div class="caption" style="margin-top:4px; text-align:center;">' + encode_entities(job.html.caption) + '</div>';
 		}
 
 		// log grid
